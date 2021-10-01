@@ -46,13 +46,14 @@ bool test_other_weird_func(char *expected) {
 }
 
 bool test_shift_seed() {
-    char original_seed[65] = "b0f09e55af064c28b1ce2ac5f0e8c857ee8bf3c73fdf8c6b5d7c5bee6d72a8ee";
+    char original_seed[65] = "125818161edec3cb26a6f00d65ab3aa6f0f9ed3c0426a2bd4d5114f11aedb973";
     char header_prefix[12] = "X-ScT9D0Me-";
     char *seed_buffer = hexstr_to_char(original_seed);
     char *output_buffer = malloc(32);
-    int length = 0; // 32
-    int shift_bytes = 0; // 11
+    int length = 32; // 32
+    int shift_bytes = 11; // 11
     shift_seed(seed_buffer, header_prefix, length, shift_bytes, output_buffer);
+    print_buf("shift_seed", output_buffer, 32);
     return false;
 }
 
@@ -63,6 +64,8 @@ int main(int ac, char** av) {
         return 0;
     }
 
-    printf("\ntest_other_weird_func: %s", (test_other_weird_func("26A6F00D1AEDB973A244429C1A9E2714AC58181665AB3AA6D89CAD04C0DF87DA6D6AAEA94D5114F1F0F9ED3C1EDEC3CB0426A2BD05602841121E1F2E1CAA5408") ? "pass" : "fail"));
+    //printf("\ntest_other_weird_func: %s", (test_other_weird_func("26A6F00D1AEDB973A244429C1A9E2714AC58181665AB3AA6D89CAD04C0DF87DA6D6AAEA94D5114F1F0F9ED3C1EDEC3CB0426A2BD05602841121E1F2E1CAA5408") ? "pass" : "fail"));
+    printf("\ntest_shift_seed: %s", (test_shift_seed() ? "pass" : "fail"));
+
 
 }
