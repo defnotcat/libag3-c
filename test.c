@@ -45,6 +45,22 @@ bool test_other_weird_func(char *expected) {
     return !strcmp(expected, buff_to_hex(buffer, 64));
 }
 
+struct Test {
+    char *expected;
+    char *original;
+    char *prefix;
+    int length;
+    int prefix_length;
+} typedef TestStruct;
+
+bool perform_test(TestStruct test) {
+    char *output = malloc(32);
+    shift_seed(hexstr_to_char(test.original), test.prefix, test.length, test.prefix_length, output);
+    char *hex = buff_to_hex(output, 32);
+    bool is_pass = !strcmp(test.expected, hex);
+    printf("\n[%s] seed=%s, header_prefix=%s, length=%d, prefix_length=%d, output=%s, expected=%s", is_pass ? "PASS" : "FAIL", test.original, test.prefix, test.length, test.prefix_length, hex, test.expected);
+}
+
 bool test_shift_seed() {
     char original_seed[65] = "125818161edec3cb26a6f00d65ab3aa6f0f9ed3c0426a2bd4d5114f11aedb973";
     char header_prefix[12] = "X-ScT9D0Me-";
@@ -64,8 +80,11 @@ int main(int ac, char** av) {
         return 0;
     }
 
-    //printf("\ntest_other_weird_func: %s", (test_other_weird_func("26A6F00D1AEDB973A244429C1A9E2714AC58181665AB3AA6D89CAD04C0DF87DA6D6AAEA94D5114F1F0F9ED3C1EDEC3CB0426A2BD05602841121E1F2E1CAA5408") ? "pass" : "fail"));
-    printf("\ntest_shift_seed: %s", (test_shift_seed() ? "pass" : "fail"));
+    char *buff = malloc(64);
+    weird_func(hexstr_to_char("72592f336d332519a244429c1a9e27144bad84710b62fc19d89cad04c0df87da6d6aaea9183db139f6be3ae7271c4e2155461e7005602841121e1f2e1caa5408"), buff);
+    print_buf("", buff, 64);
 
+    //printf("\ntest_other_weird_func: %s", (test_other_weird_func("26A6F00D1AEDB973A244429C1A9E2714AC58181665AB3AA6D89CAD04C0DF87DA6D6AAEA94D5114F1F0F9ED3C1EDEC3CB0426A2BD05602841121E1F2E1CAA5408") ? "pass" : "fail"));
+    //printf("\ntest_shift_seed: %s", (test_shift_seed() ? "pass" : "fail"));
 
 }
