@@ -1,20 +1,10 @@
 #include "libag3.h"
-#include "hex.h"
-#include <stdio.h>
-#include <intrin.h>
 
 static inline int32_t rotate_right(int32_t u, size_t r)
 {
     __asm__("rorl %%cl, %0" : "+r" (u) : "c" (r));
     return u;
 }
-
-__declspec(dllexport) inline long long mul (int a, int d)
-{
-    return (long long)((long long)a * d);
-}
-
-// todo: free mallocs
 
 void other_weird_func(char* buffer, char* seed) {
     int64_t temp = 0x14279e1a9c4244a2;
@@ -119,9 +109,6 @@ void weird_func(char* seed, char* buffer) {
             var_cc, var_dc, var_d8, var_f0,
             var_c0, var_d0, var_e0, var_d4;
 
-    // case 1
-    // while(1) { }
-
     while (var_16c > 2) {
 
         var_16c = x8_2;
@@ -221,7 +208,6 @@ void weird_func(char* seed, char* buffer) {
         var_e0 = x9_72;
         var_154 = x9_72;
         var_150 = x11_36;
-
     }
 
     int32_t x8_20 = (x8_1 | var_d4) + (x8_1 & var_d4);
@@ -258,13 +244,12 @@ void weird_func(char* seed, char* buffer) {
     memcpy(buffer+0x3c, &x9_55, 4);
 }
 
-void shift_seed(char* seed_buff, char* header_prefix, int32_t length, int32_t shifted_bytes_count, char* out_buff) {
-
+void shift_seed(char* seed_buff, char* header, int32_t length, int32_t header_length, char* out_buff) {
     int index = 0;
 
-    while (index < shifted_bytes_count) {
+    while (index < header_length) {
         unsigned char w11 = *(seed_buff + index);
-        unsigned char w12 = *(header_prefix + index);
+        unsigned char w12 = *(header + index);
 
         *(out_buff + index) = (w11 & ~w12) | (w12 & ~w11);
         index++;
@@ -278,26 +263,19 @@ void shift_seed(char* seed_buff, char* header_prefix, int32_t length, int32_t sh
 
 void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
 
-    //printf("hi!\n");
-
-    char* xor_buffer = malloc(64);
+    unsigned char xor_buffer[64];
+    unsigned char weird_func_buff[64];
     other_weird_func(xor_buffer, seed);
 
-    char* weird_func_buff = malloc(64);
-
-    //printf("seed=%s\n", bytes_to_hex(seed, 32));
-    //printf("other_weird_func res=%s\n", bytes_to_hex(xor_buffer, 64));
-
-    int32_t var_1c8, var_1c0, var_188, var_190, var_168, var_140, var_1b0, var_178, var_118, var_194, var_150, var_148, var_149, var_1a0, var_100, var_158;
-    unsigned char *var_128, *var_110;
+    int32_t var_1c8, var_1c0, var_188, var_190, var_168, var_140, var_1b0, var_178, 
+            var_118, var_194, var_150, var_148, var_149, var_1a0, var_100, var_158;
     unsigned char var_1b4, var_11c, var_17c, var_104, var_16c, var_1a4, var_159;
+    unsigned char *var_128, *var_110;
 
     int switchCase = 0xb;
     int canContinue = 1;
     while(canContinue) {
         
-       // printf("switchCase=%02x\n", switchCase);
-
         switch(switchCase) {
 
             case 0:;
@@ -318,16 +296,14 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             unsigned char x8_37 = (x9_21 & (~(x8_35))) | (x8_35 & (~(x9_21)));
             var_104 = x8_37;
             var_16c = x8_37;
-            //printf("(0x1) setting byte to write: %02x\n", x8_37);
             continue;
 
             case 2:;
             uint32_t x9_15 = var_104; 
-            uint32_t x8_26 = (*(string + ((-0x100000000 + ((long long)var_100 << 0x20)) >> 0x20))); // unsure abt that long long cast
+            uint32_t x8_26 = (*(string + ((-0x100000000 + ((long long)var_100 << 0x20)) >> 0x20)));
             switchCase = 3;
-            unsigned char x8_28 = (x8_26 | x9_15) & (~(x8_26 & x9_15)); // todo: debug here
+            unsigned char x8_28 = (x8_26 | x9_15) & (~(x8_26 & x9_15));
             var_16c = x8_28;
-            //printf("(0x2) setting byte to write: %02x\n", x8_28);
             continue;
 
             case 3:;
@@ -342,11 +318,10 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             int64_t x9_11 = var_178 & var_1c8;
             int64_t x9_12 = x10_4 + x9_11;
             var_118 = x9_12;
-            if(x10_4 == (x9_11 * -1)) // unsure? supposed to be neg(x9_11)
+            if(x10_4 == (x9_11 * -1))
                 switchCase = 6;
             else
                 switchCase = 5;
-            //printf("x10_4 = %02x, x9_11 = %02x\n", x10_4, x9_11);
 
             int32_t x8_19 = *(weird_func_buff+var_178);
             uint32_t x9_13 = *(string+x9_12);
@@ -354,7 +329,6 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             unsigned char x8_21 = (x9_13 & (~(x8_19))) | (x8_19 & ((~x9_13)));
             var_11c = x8_21;
             var_17c = x8_21;
-           // printf("(0x4) setting byte to write: %02x\n", x8_21);
             continue;
 
             case 5:;
@@ -363,7 +337,6 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             switchCase = 6;
             unsigned char x8_44 = (x8_42 | x9_23) & ~(x8_42 & x9_23);
             var_17c = x8_44;
-            //printf("(0x5) setting byte to write: %02x\n", x8_44);
             continue;
 
             case 6:;
@@ -374,7 +347,10 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
 
             case 7:;
             int64_t x8_8 = (var_1c0 ^ -0x40) + ((var_1c0 & 0x7fffffffffffffc0) << 1);
-            *(xor_buffer+36) = *(xor_buffer+36) + 0x3a;
+            int32_t temp;
+            memcpy(&temp, xor_buffer+36, 4);
+            temp += 0x3a;
+            memcpy(xor_buffer+36, &temp, 4);
             var_190 = x8_8;
             var_188 = var_1c8 + 0x40;
             switchCase = x8_8 == 0 ? 8 : 0xa;
@@ -393,7 +369,6 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             case 0xa:;
             var_1c8 = var_188;
             var_1c0 = var_190;
-            //printf("weird_func input = %s\n", bytes_to_hex(xor_buffer, 64));
             weird_func(xor_buffer, weird_func_buff);
             switchCase = 4;
             if(var_1c0 < (unsigned int)0x41)
@@ -422,7 +397,6 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
 
             case 0xf:;
             *var_128 = var_1b4;
-            //printf("writing byte: %02x to buffer\n", var_1b4);
             var_194 = 1;
             var_150 = 0x2f1; // data_196c04
             int32_t x8_54 = (var_1b0 << 1 | 2) - (var_1b0 ^ 1);
@@ -437,10 +411,8 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             var_168 = var_158;
             continue;          
 
-            // todo: complete
             case 0x11:;
             *var_110 = var_1a4;
-            //printf("writing byte: %02x to buffer (2)\n", var_1a4);
             int32_t x10_13 = 0x168; // data_196be8
             int32_t x11_1 = -0x2b5ea483; // data_196bf8
             var_158 = var_1a0 + 1;
@@ -450,15 +422,14 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             int32_t x8_63 = x9_34 & x8_62;
             var_159 = var_1a0 + 1 == var_1c0;
             int32_t x8_64 = x10_14 + (x8_63 << 1);
-            long long int x9_36 = (long long)mul(x8_64, 0x55555556);
-            //printf("x9_36 = %llx, x8_64 = %02x\n", x9_36, x8_64);
+            long long x9_36 = (long long)((long long)x8_64 * 0x55555556);
             uint32_t x9_38 = (x9_36 >> 0x20) + (x9_36 >> 0x3f);
             int32_t x10_16 = 0x2f1; // data_196c04
 
             int32_t x8_65 = (x8_64 == (x9_38 + (x9_38 << 1)));
             int32_t x9_40 = x10_16 < 0x5c;
 
-            switchCase = (((x9_40 & x8_65) | (x9_40 ^ x8_65)) == 0xd4a15b7c - ~((x11_1 * -1))) ? 0xe : 0x10; // todo: remove
+            switchCase = (((x9_40 & x8_65) | (x9_40 ^ x8_65)) == 0xd4a15b7c - ~((x11_1 * -1))) ? 0xe : 0x10;
             continue;
 
             case 0x12:;
@@ -474,15 +445,12 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             continue;
 
         }
-
     }
 }
 
-void encode_string(char* seed, char* string, char* header, char* buffer, int length) {
-
-    char* shifted_seed = malloc(32);
-    shift_seed(seed, header, 32, strlen(header), shifted_seed);
-    printf("shifted_seed = %s\n", bytes_to_hex(shifted_seed, 32));
+void encode_string(char* seed, char* string, int32_t length, char* header, int32_t header_length, char* buffer) {
+    char shifted_seed[32];
+    shift_seed(seed, header, 32, header_length, shifted_seed);
 
     encode_bytes(shifted_seed, string, buffer, length);
 }
