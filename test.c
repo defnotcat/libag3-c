@@ -22,7 +22,7 @@ char *buff_to_hex(unsigned char *buffer, int len) {
 
     int i;
     for(i = 0; i < len; i++)
-        ptr += sprintf(ptr, "%02X", buffer[i]);
+        ptr += sprintf(ptr, "%02x", buffer[i]);
     
     return output;
 }
@@ -80,9 +80,19 @@ int main(int ac, char** av) {
         return 0;
     }
 
+    int32_t test;
+    char *buff2 = hexstr_to_char("385dea1c");
+    memcpy(&test, buff2, 4);
+    printf("test=%d\n", test);
+
+
+    // 72592f336d332519a244429c1a9e27144bad84710b62fc19d89cad04c0df87da6d6aaea9183db139f6be3ae7271c4e2155461e7005602841121e1f2e1caa5408
     char *buff = malloc(64);
-    weird_func(hexstr_to_char("72592f336d332519a244429c1a9e27144bad84710b62fc19d89cad04c0df87da6d6aaea9183db139f6be3ae7271c4e2155461e7005602841121e1f2e1caa5408"), buff);
+    encode_string(hexstr_to_char("1380d71273250a113f3c02330b62fc19f6be3ae755461e70183db1396d332519"), "{\"nonce\": \"1633652373-WnSFiMq9LZeCY2w5WtaPITqAxZ20HhOu\", \"sig\": [\"samsung\\/a40eea\\/a40:10\\/QP1A.190711.020\\/A405FNXXU3BTC4:user\\/release-keys\", \"11827,1633354425,1633354425\", \"14529,1633354449,1633354449\", \"3480805\"]}", "X-ScT9D0Me-", buff, 217);
     print_buf("", buff, 64);
+    //weird_func(hexstr_to_char("8283c5ef067a356fa244429c1a9e27149fb2ae629f6bf8bcd89cad04c0df87da6d6aaea9813061843a01dd8e49f68086878966f105602841121e1f2e1caa5408"), buff);
+    //print_buf("", buff, 64);
+    //printf("weird_func = %s", buff_to_hex(buff, 64));
 
     //printf("\ntest_other_weird_func: %s", (test_other_weird_func("26A6F00D1AEDB973A244429C1A9E2714AC58181665AB3AA6D89CAD04C0DF87DA6D6AAEA94D5114F1F0F9ED3C1EDEC3CB0426A2BD05602841121E1F2E1CAA5408") ? "pass" : "fail"));
     //printf("\ntest_shift_seed: %s", (test_shift_seed() ? "pass" : "fail"));
