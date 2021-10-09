@@ -6,7 +6,7 @@ static inline int32_t rotate_right(int32_t u, size_t r)
     return u;
 }
 
-void other_weird_func(char* buffer, char* seed) {
+void generate_input_data(char* buffer, char* seed) {
     int64_t temp = 0x14279e1a9c4244a2;
 
     memcpy(buffer, seed + 8, 4);
@@ -28,7 +28,7 @@ void other_weird_func(char* buffer, char* seed) {
     memcpy(buffer + 48, seed + 20, 4);
 }
 
-void weird_func(char* seed, char* buffer) {
+void generate_output_data(char* seed, char* buffer) {
 
     int32_t x8_1;
     int32_t x8;
@@ -263,9 +263,9 @@ void shift_seed(char* seed_buff, char* header, int32_t length, int32_t header_le
 
 void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
 
-    unsigned char xor_buffer[64];
-    unsigned char weird_func_buff[64];
-    other_weird_func(xor_buffer, seed);
+    unsigned char xor_input_buff[64];
+    unsigned char xor_output_buff[64];
+    generate_input_data(xor_input_buff, seed);
 
     int32_t var_1c8, var_1c0, var_188, var_190, var_168, var_140, var_1b0, var_178, 
             var_118, var_194, var_150, var_148, var_149, var_1a0, var_100, var_158;
@@ -290,7 +290,7 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             int32_t x10_9 = (var_168 | var_140) << 1;
             int32_t x9_20 = x10_9 - x9_19;
             var_100 = x9_20;
-            uint32_t x8_35 = *(weird_func_buff+var_168);
+            uint32_t x8_35 = *(xor_output_buff+var_168);
             uint32_t x9_21 = *(string + x9_20);
             switchCase = x10_9 == x9_19 ? 3 : 2;
             unsigned char x8_37 = (x9_21 & (~(x8_35))) | (x8_35 & (~(x9_21)));
@@ -323,7 +323,7 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             else
                 switchCase = 5;
 
-            int32_t x8_19 = *(weird_func_buff+var_178);
+            int32_t x8_19 = *(xor_output_buff+var_178);
             uint32_t x9_13 = *(string+x9_12);
 
             unsigned char x8_21 = (x9_13 & (~(x8_19))) | (x8_19 & ((~x9_13)));
@@ -348,9 +348,9 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             case 7:;
             int64_t x8_8 = (var_1c0 ^ -0x40) + ((var_1c0 & 0x7fffffffffffffc0) << 1);
             int32_t temp;
-            memcpy(&temp, xor_buffer+36, 4);
+            memcpy(&temp, xor_input_buff+36, 4);
             temp += 0x3a;
-            memcpy(xor_buffer+36, &temp, 4);
+            memcpy(xor_input_buff+36, &temp, 4);
             var_190 = x8_8;
             var_188 = var_1c8 + 0x40;
             switchCase = x8_8 == 0 ? 8 : 0xa;
@@ -369,7 +369,7 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             case 0xa:;
             var_1c8 = var_188;
             var_1c0 = var_190;
-            weird_func(xor_buffer, weird_func_buff);
+            generate_output_data(xor_input_buff, xor_output_buff);
             switchCase = 4;
             if(var_1c0 < (unsigned int)0x41)
                 switchCase = 9;
@@ -443,7 +443,6 @@ void encode_bytes(char* seed, char* string, char* buffer, int32_t length) {
             int32_t x8_5 = (x8_3 | 1) & (~x8_3 | 0xfffffffe);
             var_194 = x8_5;
             continue;
-
         }
     }
 }
